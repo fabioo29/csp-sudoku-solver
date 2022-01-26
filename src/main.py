@@ -1,10 +1,25 @@
 import time
+import tkinter as tk
+from tkinter import messagebox
+from copy import deepcopy
+
+from attr import validate
+
+from data import CLEAN_BOARD, EASY_BOARD, MEDIUM_BOARD, HARD_BOARD
+
+PREBUILT_BOARDS = {
+    'clean': CLEAN_BOARD,
+    'easy': EASY_BOARD,
+    'medium': MEDIUM_BOARD,
+    'hard': HARD_BOARD
+}
 
 
 class Solver(object):
-    """class to solve the sudoku board"""
+    """class for the sudoku board solver"""
 
     def __init__(self):
+        self.board = deepcopy(PREBUILT_BOARDS['medium'])
         self.algorithms = {
             'backtracking': self.backtracking,
             'csp_backtracking': self.csp_backtracking,
@@ -24,21 +39,19 @@ class Solver(object):
         string += "-------------------------"
         return string
 
-    def board_init(self):
+    def update_board(self, tkapp: tk.Tk = None, board: str = None):
         """initializes the sudoku board"""
-        return [
-            ['0', '0', '2'] + ['0', '3', '0'] + ['0', '0', '8'],
-            ['0', '0', '0'] + ['0', '0', '8'] + ['0', '0', '0'],
-            ['0', '3', '1'] + ['0', '2', '0'] + ['0', '0', '0'],
-            # -------------------------------------------------
-            ['0', '6', '0'] + ['0', '5', '0'] + ['2', '7', '0'],
-            ['0', '1', '0'] + ['0', '0', '0'] + ['0', '5', '0'],
-            ['2', '0', '4'] + ['0', '6', '0'] + ['0', '3', '1'],
-            # -------------------------------------------------
-            ['0', '0', '0'] + ['0', '8', '0'] + ['6', '0', '5'],
-            ['0', '0', '0'] + ['0', '0', '0'] + ['0', '1', '3'],
-            ['0', '0', '5'] + ['3', '1', '0'] + ['4', '0', '0']
-        ]
+        if board is not None:
+            self.board = deepcopy(PREBUILT_BOARDS[board])
+
+        # update the board in the GUI
+        for i in range(9):
+            for j in range(9):
+                txt_input = ''
+                if self.board[i][j] != '0':
+                    txt_input = self.board[i][j]
+                tkapp.board_cells[i][j].config(
+                    text=tk.StringVar(value=txt_input))
 
     def getNextLocation(self):
         """get next empty cell on the board"""
@@ -50,6 +63,10 @@ class Solver(object):
 
     def isValid(self, row: int, col: int, num: int):
         """checks if the number is valid in the row, column and 3x3 square"""
+        if not num.isdigit():
+            return False
+        if int(num) < 1 or int(num) > 9:
+            return False
         if num in self.board[row]:
             return False
         if num in tuple(zip(*self.board))[col]:
@@ -113,7 +130,7 @@ class Solver(object):
             i, j = location
             for choice in self.rv[i][j]:
                 self.board[i][j] = choice
-                cpy = self.rv[:]
+                cpy = deepcopy(self.rv)
                 self.rv = self.getDomain()
                 if not self.isEmptyDomainProduced(i, j):
                     if self.csp_backtracking():
@@ -139,26 +156,135 @@ class Solver(object):
                     self.board[i][j] = '0'
             return False
 
-    def solve(self, method: str = 'csp_backtracking'):
+    def solve(self, tkapp: tk.Tk = None, method: str = 'csp_backtracking'):
         """solves the sudoku board with a given method"""
+        if method not in self.algorithms:
+            # raise ValueError('Invalid method')
+            messagebox.showinfo(
+                title=None,
+                message='Please choose a valid algorithm.',
+            )
+            return
+
+        # check if the board is valid
+        if not self.isValidBoard():
+            # raise ValueError('Invalid board')
+            messagebox.showinfo(
+                title=None,
+                message='Please choose a valid board.',
+            )
+            return
+
         self.iteration = 0
-        self.board = self.board_init()
+        for i in range(9):
+            for j in range(9):
+                cell_val = tkapp.board_cells[i][j].get()
+                if cell_val == '':
+                    cell_val = '0'
+                self.board[i][j] = cell_val
         if method == 'csp_backtracking':
             self.rv = self.getDomain()
         start = time.time()
         self.algorithms[method]()
         elapsed = time.time() - start
-        print(
-            method,
-            f'| iterations: {self.iteration}',
-            f'| time taken: {elapsed:.2f}s'
+        txt_info = (
+            f'iterations: {self.iteration} time taken: {elapsed:.3f}s'
         )
+        messagebox.showinfo(
+            title=method,
+            message=txt_info
+        )
+        self.update_board(tkapp)
+
+
+class SudokuApp(tk.Tk):
+    """class to create the sudoku tkinter app"""
+
+    def __init__(self, sudoku):
+        super().__init__()
+        self.sudoku = sudoku
+        self.title('Sudoku Solver')
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.create_widgets()
+
+    def validate_input(self, val, row, col):
+        """validates the input"""
+        row, col = int(row), int(col)
+        if not self.sudoku.isValid(row, col, val):
+            return False
+        self.sudoku.board[row][col] = val
+        return True
+
+    def create_widgets(self):
+        """creates the widgets for the tkinter app"""
+
+        # create the sudoku board table
+        self.table = tk.Frame(self, bg='#f0f0f0')
+        self.table.grid(row=0, column=0, sticky='nsew',
+                        pady=10, padx=10)
+
+        # fill the sudoku board
+        self.board_cells = [[tk.Entry() for _ in range(9)] for _ in range(9)]
+        for i in range(9):
+            for j in range(9):
+                txt_input = ''
+                if self.sudoku.board[i][j] != '0':
+                    txt_input = self.sudoku.board[i][j]
+
+                self.board_cells[i][j] = tk.Entry(
+                    self.table,
+                    width=4,
+                    font=('Arial', 20),
+                    borderwidth=0,
+                    relief='ridge',
+                    textvariable=tk.StringVar(
+                        self.table, value=txt_input),
+                    justify='center',
+                    validate='key',
+                    # validatecommand with passing variavel
+                    validatecommand=(self.register(
+                        self.validate_input), '%P', i, j),
+                )
+                self.board_cells[i][j].grid(row=i, column=j)
+
+                # change some 3x3 block cells
+                if (i in (0, 1, 2, 6, 7, 8)) and (j in (0, 1, 2, 6, 7, 8)) or (i in (3, 4, 5) and j in (3, 4, 5)):
+                    self.board_cells[i][j].config(bg='#f0f0f0')
+
+        # algorithms dropdown menu
+        self.algos_label = tk.StringVar(self, 'algorithm')
+        self.algos_menu = tk.OptionMenu(
+            self, self.algos_label, *self.sudoku.algorithms.keys())
+        self.algos_menu.config(width=15)
+
+        # board difficulty dropdown menu
+        self.difficulty_label = tk.StringVar(self, 'medium')
+        self.difficulty_menu = tk.OptionMenu(
+            self, self.difficulty_label, *PREBUILT_BOARDS.keys(), command=lambda x: self.sudoku.update_board(self, x))
+        self.difficulty_menu.config(width=15)
+
+        # solve button
+        self.solve_button = tk.Button(
+            self,
+            text='solve',
+            command=lambda: (
+                self.sudoku.solve(self, self.algos_label.get())
+            )
+        )
+        self.solve_button.config(width=13)
+
+        # display all elements in the app
+        self.resizable(False, False)
+        self.table.pack(fill='both', expand=True)
+        self.algos_menu.pack(side=tk.LEFT, pady=5, padx=10)
+        self.difficulty_menu.pack(side=tk.RIGHT, pady=5, padx=10)
+        self.solve_button.pack(side=tk.TOP, pady=5)
 
 
 def main():
     sudoku = Solver()
-    sudoku.solve('backtracking')
-    sudoku.solve('csp_backtracking')
+    SudokuApp(sudoku).mainloop()
 
 
 if __name__ == '__main__':
