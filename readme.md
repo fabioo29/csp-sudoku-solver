@@ -21,6 +21,7 @@
     <li><a href="#about">About</a></li>
     <li><a href="#testing">Testing</a></li>
     <li><a href="#simulation">Simulation</a></li>
+    <li><a href="#contribution">Contribution</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -126,6 +127,27 @@ After the tests we found out that the CSP based backtracking algorithm is not th
 ```python
 pip install -r requirements.txt # pygame and pyswip
 python main.py # run the GUI
+```
+
+## Contribution
+
+Feel free to submit a pull request with a better algorithm for the project.
+
+```python
+class Solver(object):
+  def __init__(self):
+    self.algorithms = {
+      'backtracking': self.backtracking,
+      'csp_backtracking': self.csp_backtracking,
+      'your_algorithm': self.your_algorithm
+    }
+
+  def your_algorithm(self, board):
+    """
+    your algorithm code here
+    make sure you update self.board
+    """
+    return board
 ```
 
 ## License
