@@ -3,8 +3,6 @@ import tkinter as tk
 from tkinter import messagebox
 from copy import deepcopy
 
-from attr import validate
-
 from data import CLEAN_BOARD, EASY_BOARD, MEDIUM_BOARD, HARD_BOARD
 
 PREBUILT_BOARDS = {
@@ -42,16 +40,19 @@ class Solver(object):
     def update_board(self, tkapp: tk.Tk = None, board: str = None):
         """initializes the sudoku board"""
         if board is not None:
-            self.board = deepcopy(PREBUILT_BOARDS[board])
+            tmp = deepcopy(PREBUILT_BOARDS[board])
+        else:
+            tmp = self.board
 
         # update the board in the GUI
         for i in range(9):
             for j in range(9):
                 txt_input = ''
-                if self.board[i][j] != '0':
-                    txt_input = self.board[i][j]
+                if tmp[i][j] != '0':
+                    txt_input = tmp[i][j]
                 tkapp.board_cells[i][j].config(
                     text=tk.StringVar(value=txt_input))
+                self.board[i][j] = tmp[i][j]
 
     def getNextLocation(self):
         """get next empty cell on the board"""
@@ -160,18 +161,9 @@ class Solver(object):
         """solves the sudoku board with a given method"""
         if method not in self.algorithms:
             # raise ValueError('Invalid method')
-            messagebox.showinfo(
+            messagebox.showwarning(
                 title=None,
                 message='Please choose a valid algorithm.',
-            )
-            return
-
-        # check if the board is valid
-        if not self.isValidBoard():
-            # raise ValueError('Invalid board')
-            messagebox.showinfo(
-                title=None,
-                message='Please choose a valid board.',
             )
             return
 
@@ -187,14 +179,22 @@ class Solver(object):
         start = time.time()
         self.algorithms[method]()
         elapsed = time.time() - start
-        txt_info = (
-            f'iterations: {self.iteration} time taken: {elapsed:.3f}s'
-        )
-        messagebox.showinfo(
-            title=method,
-            message=txt_info
-        )
-        self.update_board(tkapp)
+        # check if there's any 0 on the board
+        if any(['0' in row for row in self.board]):
+            messagebox.showerror(
+                title=None,
+                message='No solution found.',
+            )
+            return
+        else:
+            txt_info = (
+                f'iterations: {self.iteration} time taken: {elapsed:.3f}s'
+            )
+            messagebox.showinfo(
+                title=method,
+                message=txt_info
+            )
+            self.update_board(tkapp)
 
 
 class SudokuApp(tk.Tk):
@@ -214,6 +214,8 @@ class SudokuApp(tk.Tk):
         if not self.sudoku.isValid(row, col, val):
             return False
         self.sudoku.board[row][col] = val
+        self.board_cells[row][col].config(
+            text=tk.StringVar(value=val))
         return True
 
     def create_widgets(self):
