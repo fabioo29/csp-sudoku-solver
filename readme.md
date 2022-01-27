@@ -10,7 +10,7 @@
   </p>
   </br>
   <p align="center">
-    <img src="images/start.png" alt="original wumpus world map" width="270" height="260" />
+    <img src="images/start.png" alt="original wumpus world map" width="270" height="235" />
   </p>
 </p>
 

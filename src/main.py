@@ -174,8 +174,10 @@ class Solver(object):
                 if cell_val == '':
                     cell_val = '0'
                 self.board[i][j] = cell_val
+
         if method == 'csp_backtracking':
             self.rv = self.getDomain()
+
         start = time.time()
         self.algorithms[method]()
         elapsed = time.time() - start
@@ -208,16 +210,6 @@ class SudokuApp(tk.Tk):
         self.rowconfigure(0, weight=1)
         self.create_widgets()
 
-    def validate_input(self, val, row, col):
-        """validates the input"""
-        row, col = int(row), int(col)
-        if not self.sudoku.isValid(row, col, val):
-            return False
-        self.sudoku.board[row][col] = val
-        self.board_cells[row][col].config(
-            text=tk.StringVar(value=val))
-        return True
-
     def create_widgets(self):
         """creates the widgets for the tkinter app"""
 
@@ -243,10 +235,6 @@ class SudokuApp(tk.Tk):
                     textvariable=tk.StringVar(
                         self.table, value=txt_input),
                     justify='center',
-                    validate='key',
-                    # validatecommand with passing variavel
-                    validatecommand=(self.register(
-                        self.validate_input), '%P', i, j),
                 )
                 self.board_cells[i][j].grid(row=i, column=j)
 
