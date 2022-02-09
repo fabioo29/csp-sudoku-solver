@@ -37,7 +37,7 @@
 
 <div style="text-align: justify">
   
-**Motivation**: Develop a Sudoku Resolver using CSP. Try to build the CSP system as generic as possible. Note that constrains can be defined in code, or described as rules. Try to find the best solution for easily tweaking the constrains by a standard user.
+**Motivation**: Academic project for Fundamentals of Artificial Intelligence, M2AI. Develop a Sudoku Resolver using CSP. Try to build the CSP system as generic as possible. Note that constrains can be defined in code, or described as rules. Try to find the best solution for easily tweaking the constrains by a standard user.
 
 **Implementation**: For this project we started to test a simple backtracking algorithm to check its performance on this environment. A backtracking algorithm is a recursive algorithm that tries to find a solution by exploring all possible combinations of values. The algorithm is called backtracking because it backtracks when it finds a solution, and tries to find a solution for the next value.
 The time complexity of backtracking algorithm is exponential so it's quite expensive to solve a sudoku using this kind of algorithm.
