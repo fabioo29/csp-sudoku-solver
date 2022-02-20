@@ -39,16 +39,9 @@
   
 **Motivation**: Academic project for Fundamentals of Artificial Intelligence, M2AI. Develop a Sudoku Resolver using CSP. Try to build the CSP system as generic as possible. Note that constrains can be defined in code, or described as rules. Try to find the best solution for easily tweaking the constrains by a standard user.
 
-**Implementation**: For this project we started to test a simple backtracking algorithm to check its performance on this environment. A backtracking algorithm is a recursive algorithm that tries to find a solution by exploring all possible combinations of values. The algorithm is called backtracking because it backtracks when it finds a solution, and tries to find a solution for the next value.
-The time complexity of backtracking algorithm is exponential so it's quite expensive to solve a sudoku using this kind of algorithm.
-
-In order to improve it we decided to implement CSP (Constraint Satisfaction Problems) technique into the backtracking algorithm. The CSP is a generalization of the problem of finding a solution to a problem with constraints. In this case we are trying to solve a sudoku board. The sudoku board is a 9x9 matrix of numbers from 1 to 9. The goal is to fill the board with numbers from 1 to 9 in such a way that each row, column and 3x3 box contains each number exactly once. So our constraint is that each row, column and 3x3 box must contain each number from 1 to 9.
-
-To implement the CSP we defined the domain (possible remaining values) of each cell. The domain of each cell is a set of numbers from 1 to 9. The domain of a cell is the set of possible values that can be assigned to that cell.
-
-This feature can improve the performance of the backtracking algorithm because before changing the value of a cell we can check if the new value is valid before the actual change just looking at the domain of the cell.
-
-**_Tested with_** backtracking algorithm and CSP based backtracking algorithm.
+**Implementation**: All the algorithms are implemented in Python. There's also a user interface implemented with Tkinter. The user can input their own problem or select between three premade boards (eady, medium, hard). There's currently implemented two algorithms, a recursive backtracking algorithm and a the same algorithm but with CSP techniques added to it. From the metrics we can see that the CSP backtracking algorithm performs worst than the normal backtracking but this can happen due to the huge function calls during the CSP process. Otherwise is quite memory efficient compared to the generic backtracking algorithm 
+  
+**_Tested with_** Backtracking algorithm and CSP based backtracking algorithm.
 
 **_Built With_** Python3.6 and tkinter package for the interface itself.
 
@@ -118,8 +111,6 @@ This feature can improve the performance of the backtracking algorithm because b
   </tr>
 </table>
 
-After the tests we found out that the CSP based backtracking algorithm is not the best algorithm to solve sudoku boards if we need speed but, it is the most memory efficient algorithm as we can see through the iterations.
-
 <!-- SIMULATION -->
 
 ## Simulation
@@ -160,5 +151,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Fábio Oliveira - [LinkedIn](https://www.linkedin.com/in/fabioo29/) - fabiodiogo29@gmail.com
 
-Project Link: [https://github.com/fabioo29/ai-wumpus-world](https://github.com/fabioo29/ai-wumpus-world)  
+Project Link: [https://github.com/fabioo29/ai-wumpus-world](https://github.com/fabioo29/csp-sudoku-solver)  
 Project built as a Msc. Applied Artificial Intelligence Student.
