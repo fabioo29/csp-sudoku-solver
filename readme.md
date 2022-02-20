@@ -151,5 +151,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Fábio Oliveira - [LinkedIn](https://www.linkedin.com/in/fabioo29/) - fabiodiogo29@gmail.com
 
-Project Link: [https://github.com/fabioo29/ai-wumpus-world](https://github.com/fabioo29/csp-sudoku-solver)  
+Project Link: [https://github.com/fabioo29/csp-sudoku-solver](https://github.com/fabioo29/csp-sudoku-solver)  
 Project built as a Msc. Applied Artificial Intelligence Student.
